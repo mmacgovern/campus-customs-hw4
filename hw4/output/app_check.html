@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus Customs App Check</title>
+<style>
+  :root { --blue:#00356b; --navy:#0a1e3c; --accent:#286dc0; --paper:#f8f6f1; --line:#e4e0d6; --ink:#1b2433; --muted:#5b6575; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  header { background:var(--blue); color:#fff; padding:32px 16px; }
+  header div, main { max-width:1000px; margin:0 auto; }
+  h1 { font-family:Georgia,serif; margin:0 0 6px; font-size:2rem; }
+  header p { margin:0; opacity:.85; }
+  main { padding:24px 16px 64px; }
+  .summary { background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px 20px; }
+  .summary ul { list-style:none; padding:0; margin:8px 0 0; }
+  .summary li { margin:4px 0; }
+  section { background:#fff; border:1px solid var(--line); border-top:5px solid var(--blue); border-radius:12px; padding:24px; margin-top:28px; }
+  h2 { font-family:Georgia,serif; color:var(--navy); margin:0 0 14px; }
+  figure { margin:0 0 14px; }
+  figure img { width:100%; border:1px solid var(--line); border-radius:8px; display:block; }
+  figcaption { color:var(--muted); font-size:.9rem; margin-top:6px; }
+  .reply { background:#eef3fb; border-radius:8px; padding:12px 14px; white-space:pre-wrap; }
+  .reply span { display:block; font-size:.75rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); }
+  table { border-collapse:collapse; margin:8px 0 14px; min-width:260px; }
+  th, td { text-align:left; padding:6px 14px; border-bottom:1px solid var(--line); }
+  th { font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  tr.hl td { background:#fff3d6; font-weight:700; }
+  code { background:#f0eee8; padding:1px 5px; border-radius:4px; font-size:.9em; }
+  .badge { display:inline-block; padding:1px 10px; border-radius:999px; font-size:.8rem; font-weight:700; }
+  .pass { background:#e8f5ed; color:#1e7a46; } .fail { background:#fdecea; color:#b42318; } .pending { background:#fff3d6; color:#8a5300; }
+  .pending-box { background:#fff3d6; border:1px dashed #e0b64c; border-radius:8px; padding:14px 16px; margin-bottom:12px; }
+  .meta { color:var(--muted); font-size:.85rem; margin-top:28px; }
+</style>
+</head>
+<body>
+<header><div>
+  <h1>Campus Customs App Check</h1>
+  <p>Screenshots of the running site (FastAPI on :8000, React/Vite on :5173), captured with Playwright, and checked against <code style="background:rgba(255,255,255,.15);color:#fff">data/campus_customs.db</code>.</p>
+</div></header>
+<main>
+  <div class="summary"><strong>Results</strong><ul><li><span class="badge pending">Pending</span> 1. Inventory and price answer</li><li><span class="badge pending">Pending</span> 2. Search shows product cards</li><li><span class="badge pass">Pass</span> 3. Usability: filter and sort</li></ul></div>
+
+  <section>
+    <h2>1. Chat answers a stock and price question for one item in one size</h2>
+    <p><strong>Database values</strong> for <em>Yale Dad Hoodie</em> (<code>yale-dad-hoodie</code>):
+    price <strong>$68.00</strong>; size <strong>M</strong> has <strong>12</strong> in stock.</p>
+    <table><thead><tr><th>inventory.size</th><th>inventory.quantity</th></tr></thead><tbody><tr class=""><td>XS</td><td>5</td></tr><tr class=""><td>S</td><td>5</td></tr><tr class="hl"><td>M</td><td>12</td></tr><tr class=""><td>L</td><td>20</td></tr><tr class=""><td>XL</td><td>12</td></tr><tr class=""><td>XXL</td><td>15</td></tr></tbody></table>
+    <div class="pending-box"><strong>Not captured yet.</strong> The chatbot needs <code>PORTKEY_API_KEY</code> and <code>MODEL_NAME</code> in <code>hw4/.env</code>. Add them, then run <code>.venv\Scripts\python tests\app_check.py</code> from <code>hw4</code> to capture this screenshot and refresh this page.</div><p><strong>What it will prove:</strong> asking “How much is the Yale Dad Hoodie, and do you have it in a medium?” returns $68.00 and 12 in size M, the exact database values above.</p>
+  </section>
+
+  <section>
+    <h2>2. “What hoodies do you have?” puts product cards on the page</h2>
+    <div class="pending-box"><strong>Not captured yet.</strong> The chatbot needs <code>PORTKEY_API_KEY</code> and <code>MODEL_NAME</code> in <code>hw4/.env</code>. Add them, then run <code>.venv\Scripts\python tests\app_check.py</code> from <code>hw4</code> to capture this screenshot and refresh this page.</div><p><strong>What it will prove:</strong> the chatbot's catalogue search returns product cards that appear in the main page area (up to 12 of the 27 hoodies in the database), and each card opens the normal product page.</p>
+  </section>
+
+  <section>
+    <h2>3. Usability: search, category filter and price sort (Problem 9)</h2>
+    
+        <figure><img src="app_check_images/usability.png" alt="Products page filtered to Hoodies and sorted by price, low to high">
+        <figcaption>Products page → Category: <em>Hoodies</em>, Sort: <em>Price: low to high</em></figcaption></figure>
+        <p><strong>What it proves:</strong> the Problem 9 search, filter and sort toolbar works in the running app.
+        It shows “Showing 27 of 102 products”, matching the 27 hoodies in the database. The first card
+        is $45.00, the cheapest hoodie in the database ($45.00), and prices rise from there.</p>
+        <p>Count matches DB: <span class="badge pass">Pass</span> &nbsp; Sorted low to high: <span class="badge pass">Pass</span></p>
+  </section>
+
+  <p class="meta">Generated 2026-10-04 10:55 by <code>tests/app_check.py</code>
+  · Chat model: not configured (.env missing) · Browser: Chrome via Playwright, 1280×860.</p>
+</main>
+</body>
+</html>

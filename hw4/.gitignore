@@ -1,0 +1,36 @@
+# ---- Secrets ----
+.env
+.env.*
+!.env.example
+
+# ---- Data pack: database and product images (download separately) ----
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# ---- Python ----
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- Node / front end ----
+node_modules/
+frontend/dist/
+dist/
+build/
+*.tsbuildinfo
+*.log
+
+# ---- Editors / OS ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Note: output/ (including output/app_check_images/) is committed on purpose.

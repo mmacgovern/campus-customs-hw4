@@ -1,0 +1,16 @@
+# Campus Customs back end + tests. Install with:
+#   python -m pip install -r requirements.txt
+
+# --- API server ---
+fastapi>=0.142
+uvicorn[standard]>=0.54
+itsdangerous>=2.2        # signed session cookies (Starlette SessionMiddleware)
+python-dotenv>=1.2       # loads hw4/.env at run time
+pydantic>=2.13
+
+# --- Chatbot agent (OpenAI-compatible client, used through Portkey) ---
+pydantic-ai-slim[openai]>=2.54
+
+# --- Tests (tests/*.py) ---
+httpx2>=2.13             # FastAPI TestClient
+playwright>=1.63         # tests/app_check.py; uses your installed Chrome

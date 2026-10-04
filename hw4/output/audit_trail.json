@@ -1,0 +1,35 @@
+[
+  {
+    "time": "2026-10-04T14:59:27.920+00:00",
+    "user": "guest",
+    "page": {
+      "path": "/",
+      "product_id": null
+    },
+    "message": "first run: how much is the Yale Dad Hoodie?",
+    "tool_calls": [],
+    "model_requests": 0,
+    "stop_reason": "not_configured",
+    "finish_reason": null,
+    "reply": null,
+    "cards_returned": 0,
+    "duration_ms": 0
+  }
+,
+  {
+    "time": "2026-10-04T14:59:30.427+00:00",
+    "user": "guest",
+    "page": {
+      "path": "/",
+      "product_id": null
+    },
+    "message": "second run after restart",
+    "tool_calls": [],
+    "model_requests": 0,
+    "stop_reason": "not_configured",
+    "finish_reason": null,
+    "reply": null,
+    "cards_returned": 0,
+    "duration_ms": 0
+  }
+]
