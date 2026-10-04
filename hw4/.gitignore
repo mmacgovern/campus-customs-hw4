@@ -27,6 +27,9 @@ build/
 *.tsbuildinfo
 *.log
 
+# ---- Local assistant instructions (not part of the product) ----
+CLAUDE.md
+
 # ---- Editors / OS ----
 .vscode/
 .idea/

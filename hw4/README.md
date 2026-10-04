@@ -18,7 +18,7 @@ hw4/
   .env.example         settings template: copy to .env
   backend/             FastAPI app + PydanticAI agent
     main.py  agent.py  models.py  tools.py  prompts/prompt.md
-    auth.py  history.py  audit.py  db.py
+    auth.py  history.py  audit.py  db.py   API helpers (the agent is the four files above)
   frontend/            React + Vite + TypeScript site
   output/              written docs and evidence
     harness.md  design.md  usability.md  app_check.html  app_check_images/  audit_trail.json
@@ -87,6 +87,7 @@ Open **http://localhost:5173**. Vite forwards `/api`, `/chat` and `/images` to t
 From `hw4/` with the venv active:
 
 ```powershell
+python tests\check_auth.py         # password hashing, login, sign-up
 python tests\check_chat_tools.py   # tools vs. database
 python tests\check_memory.py       # chat history, identity, page context
 python tests\check_usability.py    # filters, alternatives, low stock

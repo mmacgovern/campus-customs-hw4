@@ -40,19 +40,34 @@
   <p>Screenshots of the running site (FastAPI on :8000, React/Vite on :5173), captured with Playwright, and checked against <code style="background:rgba(255,255,255,.15);color:#fff">data/campus_customs.db</code>.</p>
 </div></header>
 <main>
-  <div class="summary"><strong>Results</strong><ul><li><span class="badge pending">Pending</span> 1. Inventory and price answer</li><li><span class="badge pending">Pending</span> 2. Search shows product cards</li><li><span class="badge pass">Pass</span> 3. Usability: filter and sort</li></ul></div>
+  <div class="summary"><strong>Results</strong><ul><li><span class="badge pass">Pass</span> 1. Inventory and price answer</li><li><span class="badge pass">Pass</span> 2. Search shows product cards</li><li><span class="badge pass">Pass</span> 3. Usability: filter and sort</li></ul></div>
 
   <section>
     <h2>1. Chat answers a stock and price question for one item in one size</h2>
     <p><strong>Database values</strong> for <em>Yale Dad Hoodie</em> (<code>yale-dad-hoodie</code>):
-    price <strong>$68.00</strong>; size <strong>M</strong> has <strong>12</strong> in stock.</p>
-    <table><thead><tr><th>inventory.size</th><th>inventory.quantity</th></tr></thead><tbody><tr class=""><td>XS</td><td>5</td></tr><tr class=""><td>S</td><td>5</td></tr><tr class="hl"><td>M</td><td>12</td></tr><tr class=""><td>L</td><td>20</td></tr><tr class=""><td>XL</td><td>12</td></tr><tr class=""><td>XXL</td><td>15</td></tr></tbody></table>
-    <div class="pending-box"><strong>Not captured yet.</strong> The chatbot needs <code>PORTKEY_API_KEY</code> and <code>MODEL_NAME</code> in <code>hw4/.env</code>. Add them, then run <code>.venv\Scripts\python tests\app_check.py</code> from <code>hw4</code> to capture this screenshot and refresh this page.</div><p><strong>What it will prove:</strong> asking “How much is the Yale Dad Hoodie, and do you have it in a medium?” returns $68.00 and 12 in size M, the exact database values above.</p>
+    price <strong>$68.00</strong>; size <strong>L</strong> has <strong>20</strong> in stock.</p>
+    <table><thead><tr><th>inventory.size</th><th>inventory.quantity</th></tr></thead><tbody><tr class=""><td>XS</td><td>5</td></tr><tr class=""><td>S</td><td>5</td></tr><tr class=""><td>M</td><td>12</td></tr><tr class="hl"><td>L</td><td>20</td></tr><tr class=""><td>XL</td><td>12</td></tr><tr class=""><td>XXL</td><td>15</td></tr></tbody></table>
+    
+        <figure><img src="app_check_images/inventory.png" alt="Chat answering a price and stock question on the Yale Dad Hoodie page">
+        <figcaption>Asked on the product page: “How much is the Yale Dad Hoodie, and do you have it in a large?”</figcaption></figure>
+        <p class="reply"><span>Agent reply</span>The Yale Dad Hoodie is $68.00, and yes—it’s in stock in large, with 20 available.</p>
+        <p><strong>What it proves:</strong> the agent answered from its database tools, not from memory.
+        The price ($68.00) and the stock for size L (20) in the reply
+        match the database rows above exactly. The size tiles on the page show the same numbers.</p>
+        <p>Price in reply matches DB: <span class="badge pass">Pass</span> &nbsp; Quantity in reply matches DB: <span class="badge pass">Pass</span></p>
   </section>
 
   <section>
     <h2>2. “What hoodies do you have?” puts product cards on the page</h2>
-    <div class="pending-box"><strong>Not captured yet.</strong> The chatbot needs <code>PORTKEY_API_KEY</code> and <code>MODEL_NAME</code> in <code>hw4/.env</code>. Add them, then run <code>.venv\Scripts\python tests\app_check.py</code> from <code>hw4</code> to capture this screenshot and refresh this page.</div><p><strong>What it will prove:</strong> the chatbot's catalogue search returns product cards that appear in the main page area (up to 12 of the 27 hoodies in the database), and each card opens the normal product page.</p>
+    
+        <figure><img src="app_check_images/search_cards.png" alt="Hoodie product cards on the Chat results page after asking the chatbot">
+        <figcaption>Asked in the chat: “what hoodies do you have?”</figcaption></figure>
+        <p class="reply"><span>Agent reply</span>We have 27 hoodies, with the first 12 shown here. Options include classic Big YALE styles, Champion and Brooks Brothers zip-ups, vintage Bulldog designs, and Yale sports hoodies like hockey, fencing, sailing and squash. You can narrow the selection by color, college or budget. Boola boola!
+Showing 12 products on the page.</p>
+        <p><strong>What it proves:</strong> the agent called <code>search_catalogue</code> and the
+        <code>/chat</code> reply carried structured product cards. The page switched to <em>Chat results</em>
+        and showed 12 cards (capped at 12; the database has 27 hoodies).
+        Every card is a real hoodie from the catalogue: <span class="badge pass">Pass</span></p>
   </section>
 
   <section>
@@ -66,8 +81,8 @@
         <p>Count matches DB: <span class="badge pass">Pass</span> &nbsp; Sorted low to high: <span class="badge pass">Pass</span></p>
   </section>
 
-  <p class="meta">Generated 2026-10-04 10:55 by <code>tests/app_check.py</code>
-  · Chat model: not configured (.env missing) · Browser: Chrome via Playwright, 1280×860.</p>
+  <p class="meta">Generated 2026-10-04 11:27 by <code>tests/app_check.py</code>
+  · Chat model: gpt-5.6-luna · Browser: Chrome via Playwright, 1600×900.</p>
 </main>
 </body>
 </html>

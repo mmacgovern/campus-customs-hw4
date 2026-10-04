@@ -15,7 +15,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
-from pydantic_ai.exceptions import UsageLimitExceeded
+from pydantic_ai.exceptions import ModelHTTPError, UsageLimitExceeded
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -155,6 +155,20 @@ def chat_history(request: Request) -> ChatHistoryReply:
     return ChatHistoryReply(messages=history.load_recent(user["id"], history.PANEL_HISTORY_LIMIT))
 
 
+# Sent when the model provider's safety filter blocks a message (for example
+# a prompt-injection attempt). The safety layer worked, so answer politely
+# instead of showing an error.
+FILTERED_REPLY = (
+    "Sorry, I can't help with that. I'm here to help you find Campus Customs gear: "
+    "ask me about products, sizes, stock or prices!"
+)
+
+
+def is_content_filter(exc: ModelHTTPError) -> bool:
+    text = str(exc.body).lower()
+    return exc.status_code == 400 and ("content management policy" in text or "content_filter" in text)
+
+
 LIMIT_REPLY = (
     "That question needed more steps than I'm allowed for one message. "
     "Could you ask about one product or one kind of item at a time?"
@@ -189,6 +203,13 @@ async def chat(body: ChatRequest, request: Request) -> ChatReply:
         stop_reason = "not_configured"
         logging.getLogger("uvicorn.error").error("Chat is not configured: check hw4/.env.")
         raise HTTPException(503, "The shopping assistant isn't set up yet. Please try again later.")
+    except ModelHTTPError as exc:
+        if not is_content_filter(exc):
+            stop_reason = f"error: {type(exc).__name__}"
+            logging.getLogger("uvicorn.error").error("Chat failed: %s %s", type(exc).__name__, exc.status_code)
+            raise HTTPException(502, "Sorry, the assistant is having trouble right now. Please try again.")
+        stop_reason = "content_filter"
+        reply = ChatReply(reply=FILTERED_REPLY, products=[])
     except UsageLimitExceeded as exc:
         # Hit the step or tool-call limit: answer politely instead of failing.
         stop_reason = "usage_limit: " + str(exc).split(". ")[0]

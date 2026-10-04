@@ -37,8 +37,8 @@ FRONT = "http://localhost:5173"
 BACK = "http://localhost:8000"
 
 # Check 1: one item, one size.
-INV_PRODUCT_ID, INV_SIZE = "yale-dad-hoodie", "M"
-INV_QUESTION = "How much is the Yale Dad Hoodie, and do you have it in a medium?"
+INV_PRODUCT_ID, INV_SIZE = "yale-dad-hoodie", "L"
+INV_QUESTION = "How much is the Yale Dad Hoodie, and do you have it in a large?"
 SEARCH_QUESTION = "what hoodies do you have?"
 AGENT_TIMEOUT_MS = 120_000
 
@@ -292,7 +292,7 @@ def write_report(inv: dict | None, search: dict | None, usab: dict, model: str |
   </section>
 
   <p class="meta">Generated {datetime.now().strftime("%Y-%m-%d %H:%M")} by <code>tests/app_check.py</code>
-  · Chat model: {esc(model) if model else "not configured (.env missing)"} · Browser: Chrome via Playwright, 1280×860.</p>
+  · Chat model: {esc(model) if model else "not configured (.env missing)"} · Browser: Chrome via Playwright, 1600×900.</p>
 </main>
 </body>
 </html>
@@ -310,13 +310,13 @@ def main() -> None:
     try:
         with sync_playwright() as pw:
             browser = pw.chromium.launch(channel="chrome", headless=True)
-            page = browser.new_page(viewport={"width": 1280, "height": 860})
+            page = browser.new_page(viewport={"width": 1600, "height": 900})
             inv = search = None
             if live:
                 print("1. inventory ...")
                 inv = check_inventory(page, db)
                 print(f"   reply: {inv['reply']}\n   price ok={inv['price_ok']} qty ok={inv['qty_ok']}")
-                page = browser.new_page(viewport={"width": 1280, "height": 860})  # fresh chat
+                page = browser.new_page(viewport={"width": 1600, "height": 900})  # fresh chat
                 print("2. search cards ...")
                 search = check_search_cards(page, db)
                 print(f"   {len(search['cards'])} cards, all hoodies={search['all_hoodies']}")

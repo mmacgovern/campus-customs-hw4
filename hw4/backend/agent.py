@@ -5,9 +5,11 @@ Settings come from hw4/.env at run time:
     MODEL_NAME       OpenAI 5.6 or 6 series model name as Portkey knows it
 """
 
+import asyncio
 import logging
 import os
 import re
+import weakref
 from functools import lru_cache
 from pathlib import Path
 
@@ -58,6 +60,22 @@ def make_model() -> OpenAIChatModel:
         log.warning("MODEL_NAME %r is not an OpenAI 5.6 or 6 series model.", model_name)
     provider = OpenAIProvider(base_url=PORTKEY_BASE_URL, api_key=api_key)
     return OpenAIChatModel(model_name, provider=provider)
+
+
+# One model client per event loop: the HTTP connection pool inside the
+# OpenAI client is tied to the loop that created it, and reusing it from a
+# new loop fails with "Event loop is closed".
+_loop_models: "weakref.WeakKeyDictionary[asyncio.AbstractEventLoop, OpenAIChatModel]" = (
+    weakref.WeakKeyDictionary()
+)
+
+
+def model_for_current_loop() -> OpenAIChatModel:
+    loop = asyncio.get_running_loop()
+    model = _loop_models.get(loop)
+    if model is None:
+        model = _loop_models[loop] = make_model()
+    return model
 
 
 @lru_cache(maxsize=1)
@@ -124,8 +142,10 @@ async def run_chat(
     run fails or hits a limit) so the caller can write the audit trail."""
     with capture_run_messages() as messages:
         try:
-            result = await get_agent().run(
+            agent = get_agent()
+            result = await agent.run(
                 message,
+                model=model_for_current_loop(),  # a test's agent.override(model=...) still wins
                 message_history=to_message_history(history),
                 deps=deps,
                 usage_limits=UsageLimits(

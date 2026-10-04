@@ -1,7 +1,8 @@
 """Create account, log in, log out, and current-user routes.
 
-Passwords use the same scheme as the existing users in the database:
-    pbkdf2_sha256$<salt>$<hex digest>   (PBKDF2-HMAC-SHA256, 120,000 iterations)
+Passwords are hashed with salted PBKDF2-HMAC-SHA256. Two formats verify:
+    pbkdf2_sha256$<iterations>$<salt>$<hex digest>   new accounts (600,000 iterations)
+    pbkdf2_sha256$<salt>$<hex digest>                 seed users (120,000 iterations)
 Plain passwords and hashes are never logged or returned.
 """
 
@@ -20,7 +21,8 @@ from db import get_db
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 HASH_SCHEME = "pbkdf2_sha256"
-HASH_ITERATIONS = 120_000
+HASH_ITERATIONS = 600_000  # new accounts (OWASP recommendation for PBKDF2-SHA256)
+LEGACY_ITERATIONS = 120_000  # the data pack's 3-part hashes
 MIN_PASSWORD_LENGTH = 8
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
@@ -30,17 +32,21 @@ EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 def hash_password(password: str) -> str:
     salt = secrets.token_urlsafe(12)
     digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt.encode(), HASH_ITERATIONS)
-    return f"{HASH_SCHEME}${salt}${digest.hex()}"
+    return f"{HASH_SCHEME}${HASH_ITERATIONS}${salt}${digest.hex()}"
 
 
 def verify_password(password: str, stored: str) -> bool:
-    try:
-        scheme, salt, expected = stored.split("$")
-    except ValueError:
+    parts = stored.split("$")
+    if len(parts) == 4 and parts[1].isdigit():
+        scheme, iterations, salt, expected = parts[0], int(parts[1]), parts[2], parts[3]
+    elif len(parts) == 3:
+        scheme, salt, expected = parts
+        iterations = LEGACY_ITERATIONS
+    else:
         return False
-    if scheme != HASH_SCHEME:
+    if scheme != HASH_SCHEME or not 1 <= iterations <= 10_000_000:
         return False
-    digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt.encode(), HASH_ITERATIONS)
+    digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt.encode(), iterations)
     return hmac.compare_digest(digest.hex(), expected)
 
 
